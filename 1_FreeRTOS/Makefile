@@ -31,9 +31,13 @@ vpath %.c $(STM_SRC)
 
 # My source file
 SRCS   = src/main.c
+SRCS  += src/led.c
+SRCS  += src/usart.c
+SRCS  += src/shell.c
 
 SRCS  += stm32f4xx_rcc.c
 SRCS  += stm32f4xx_gpio.c
+SRCS  += stm32f4xx_usart.c
 
 # Contains initialisation code and must be compiled into
 # our project. This file is in the current directory and
@@ -86,7 +90,7 @@ GDB     = arm-none-eabi-gdb
 INCLUDE = $(addprefix -I,$(INC_DIRS))
 
 # #defines needed when working with the STM library
-DEFS    =  -DHSE_VALUE=8000000 -DUSE_STM32F429I_DISCO -DSTM32F42_43xxx -DUSE_STDPERIPH_DRIVER
+DEFS    =  -DHSE_VALUE=8000000 -DSTM32F42_43xxx -DUSE_STDPERIPH_DRIVER
 # if you use the following option, you must implement the function
 #    assert_failed(uint8_t* file, uint32_t line)
 # because it is conditionally used in the library
@@ -99,11 +103,12 @@ CFLAGS += -O0
 CFLAGS += -Wall -Wextra -Warray-bounds
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
+CFLAGS += -std=gnu99
 
 ## Linker options
 # tell ld which linker file to use
 # (this file is in the current directory)
-LFLAGS  = -Tstm32f4_flash.ld --specs=nosys.specs
+LFLAGS  = -Tstm32f4_flash.ld --specs=nosys.specs -lc -lgcc
 
 
 ######################################################################
