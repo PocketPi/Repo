@@ -19,9 +19,9 @@ STM_SRC = $(STM_DIR)/Libraries/STM32F4xx_StdPeriph_Driver/src
 
 # This is the directory containing FreeRTOS
 FREERTOS_DIR=FreeRTOS_Source
-
+FREERTOS_DIR=../FreeRTOSv10.0.0/FreeRTOS
 # These are where the FreeRTOS files located
-FREERTOS_SRC=$(FREERTOS_DIR)
+FREERTOS_SRC=$(FREERTOS_DIR)/Source
 FREERTOS_PORT=$(FREERTOS_SRC)/portable
 FREERTOS_PORT_PLAT=$(FREERTOS_PORT)/GCC/ARM_CM4F
 
@@ -32,7 +32,7 @@ vpath %.c $(STM_SRC)
 # My source file
 SRCS   = src/main.c
 
-SRCS  += stm32f4xx_rcc.c 
+SRCS  += stm32f4xx_rcc.c
 SRCS  += stm32f4xx_gpio.c
 
 # Contains initialisation code and must be compiled into
@@ -62,7 +62,7 @@ INC_DIRS += $(STM_DIR)/Libraries/STM32F4xx_StdPeriph_Driver/inc
 INC_DIRS += $(FREERTOS_SRC)/include
 INC_DIRS += $(FREERTOS_PORT_PLAT)
 
-# in case we have to many sources and don't want 
+# in case we have to many sources and don't want
 # to compile all sources every time
 # OBJS = $(SRCS:.c=.o)
 
@@ -87,7 +87,7 @@ INCLUDE = $(addprefix -I,$(INC_DIRS))
 
 # #defines needed when working with the STM library
 DEFS    =  -DHSE_VALUE=8000000 -DUSE_STM32F429I_DISCO -DSTM32F42_43xxx -DUSE_STDPERIPH_DRIVER
-# if you use the following option, you must implement the function 
+# if you use the following option, you must implement the function
 #    assert_failed(uint8_t* file, uint32_t line)
 # because it is conditionally used in the library
 # DEFS   += -DUSE_FULL_ASSERT
@@ -103,7 +103,7 @@ CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 ## Linker options
 # tell ld which linker file to use
 # (this file is in the current directory)
-LFLAGS  = -Tstm32f4_flash.ld --specs=nosys.specs 
+LFLAGS  = -Tstm32f4_flash.ld --specs=nosys.specs
 
 
 ######################################################################
@@ -114,7 +114,7 @@ LFLAGS  = -Tstm32f4_flash.ld --specs=nosys.specs
 $(PROJ_NAME): $(PROJ_NAME).elf
 
 $(PROJ_NAME).elf: $(SRCS)
-	$(CC) $(INCLUDE) $(DEFS) $(CFLAGS) $(LFLAGS) $^ -o $@ 
+	$(CC) $(INCLUDE) $(DEFS) $(CFLAGS) $(LFLAGS) $^ -o $@
 	$(OBJCOPY) -O ihex $(PROJ_NAME).elf   $(PROJ_NAME).hex
 	$(OBJCOPY) -O binary $(PROJ_NAME).elf $(PROJ_NAME).bin
 
@@ -122,7 +122,7 @@ clean:
 	rm -f *.o $(PROJ_NAME).elf $(PROJ_NAME).hex $(PROJ_NAME).bin
 
 # Flash the STM32F4
-flash: 
+flash:
 	st-flash write $(PROJ_NAME).bin 0x8000000
 
 .PHONY: debug

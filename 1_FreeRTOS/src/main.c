@@ -1,5 +1,6 @@
 /* Standard includes. */
 #include <stdint.h>
+#include <stdio.h>
 
 /* Kernel includes. */
 #include "FreeRTOS.h"
@@ -10,7 +11,7 @@
 
 /* The period of the example software timer, specified in milliseconds, and
 converted to ticks using the portTICK_RATE_MS constant. */
-#define mainSOFTWARE_TIMER_PERIOD_MS		( 500 / portTICK_RATE_MS )
+#define mainSOFTWARE_TIMER_PERIOD_MS        ( 100 / portTICK_RATE_MS )
 
 /*-----------------------------------------------------------*/
 static void vLedTimerCallback( xTimerHandle xTimer );
@@ -34,28 +35,31 @@ static void init_hw(void)
 
 int main(void)
 {
-	xTimerHandle xLedTimer = NULL;
+    xTimerHandle xLedTimer = NULL;
 
-	init_hw();
+    init_hw();
 
-	xLedTimer = xTimerCreate( 	( const signed char * ) "LEDTimer", /* A text name, purely to help debugging. */
-								mainSOFTWARE_TIMER_PERIOD_MS,					/* The timer period, in this case 1000ms (1s). */
-								pdTRUE,											/* This is a periodic timer, so xAutoReload is set to pdTRUE. */
-								( void * ) 0,									/* The ID is not used, so can be set to anything. */
-								vLedTimerCallback							/* The-DUSE_STM32F429I_DISCO callback function that switches the LED off. */
-							);
+    xLedTimer = xTimerCreate(   ( const   char * ) "LEDTimer",
+                                mainSOFTWARE_TIMER_PERIOD_MS,
+                                pdTRUE,
+                                ( void * ) 0,
+                                vLedTimerCallback
+                            );
 
-	xTimerStart( xLedTimer, 0 );
+    xTimerStart( xLedTimer, 0 );
 
-	/* Start the tasks and timer running. */
-	vTaskStartScheduler();
+    printf("test\n");
 
-	for( ;; );
+    /* Start the tasks and timer running. */
+    vTaskStartScheduler();
+
+    for( ;; );
 }
 /*-----------------------------------------------------------*/
 
 static void vLedTimerCallback( xTimerHandle xTimer )
 {
-	GPIOG->ODR ^= GPIO_Pin_13;
+    (void)xTimer;
+    GPIOG->ODR ^= GPIO_Pin_13;
 }
 

@@ -1,6 +1,6 @@
 /*
     FreeRTOS V7.1.1 - Copyright (C) 2012 Real Time Engineers Ltd.
-	
+
 
     ***************************************************************************
      *                                                                       *
@@ -40,7 +40,7 @@
     FreeRTOS WEB site.
 
     1 tab == 4 spaces!
-    
+
     ***************************************************************************
      *                                                                       *
      *    Having a problem?  Start by reading the FAQ "My application does   *
@@ -50,17 +50,17 @@
      *                                                                       *
     ***************************************************************************
 
-    
-    http://www.FreeRTOS.org - Documentation, training, latest information, 
+
+    http://www.FreeRTOS.org - Documentation, training, latest information,
     license and contact details.
-    
+
     http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
     including FreeRTOS+Trace - an indispensable productivity tool.
 
-    Real Time Engineers ltd license FreeRTOS to High Integrity Systems, who sell 
-    the code with commercial support, indemnification, and middleware, under 
+    Real Time Engineers ltd license FreeRTOS to High Integrity Systems, who sell
+    the code with commercial support, indemnification, and middleware, under
     the OpenRTOS brand: http://www.OpenRTOS.com.  High Integrity Systems also
-    provide a safety engineered and independently SIL3 certified version under 
+    provide a safety engineered and independently SIL3 certified version under
     the SafeRTOS brand: http://www.SafeRTOS.com.
 */
 
@@ -84,7 +84,7 @@
 #define configUSE_TICK_HOOK				0
 #define configCPU_CLOCK_HZ				( 168000000UL )
 #define configTICK_RATE_HZ				( ( portTickType ) 1000 )
-#define configMAX_PRIORITIES			( ( unsigned portBASE_TYPE ) 5 )
+#define configMAX_PRIORITIES			( 5 )
 #define configMINIMAL_STACK_SIZE		( ( unsigned short ) 70 )
 #define configTOTAL_HEAP_SIZE			( ( size_t ) ( 7 * 1024 ) )
 #define configMAX_TASK_NAME_LEN			( 10 )
@@ -134,9 +134,9 @@ to exclude the API function. */
 #define configKERNEL_INTERRUPT_PRIORITY 	( configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 /* Priority 5, or 95 as only the top four bits are implemented. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 	( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
-	
-#define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }	
-	
+
+#define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }
+
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
