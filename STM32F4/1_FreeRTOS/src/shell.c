@@ -10,13 +10,16 @@
 
 static char get_char()
 {
-    char c = '\0';
-    do {
-        c = USART_ReadByte(USART6);
-    } while (c == '\0');
+    char c[] = "\0";
 
-    USART_SendByte(USART6, (uint16_t)c);
-    return c;
+    do {
+        if (USART6->SR & USART_SR_RXNE) {
+            c[0] = USART_ReadByte(USART6);
+        }
+    } while (c[0] == '\0');
+
+    USART_SendByte(USART6, c[0]);
+    return c[0];
 }
 
 int read_line(char * buffer)
@@ -28,7 +31,9 @@ int read_line(char * buffer)
         // Read a character
         c = get_char();
 
-        if (c == '\n') {
+        if (c == '\r') {
+            buffer[position++] = '\n';
+            buffer[position++] = '\r';
             buffer[position] = '\0';
             return 0;
         } else {
@@ -46,10 +51,9 @@ void shell_task()
 
     memset(line, '\0', LINE_BUFSIZE);
 
-
     do {
         my_printf("> ");
         read_line(line);
-        my_printf("got: %s\n", line);
-    }while (status == 1);
+        my_printf("got: %s", line);
+    }while (status == 0);
 }
