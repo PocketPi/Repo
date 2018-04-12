@@ -127,8 +127,9 @@ clean:
 	rm -f *.o $(PROJ_NAME).elf $(PROJ_NAME).hex $(PROJ_NAME).bin
 
 # Flash the STM32F4
+STLINK_DIR := /home/peter/Git/Repo/stlink/build/Release/
 flash:
-	st-flash write $(PROJ_NAME).bin 0x8000000
+	$(STLINK_DIR)st-flash write $(PROJ_NAME).bin 0x8000000
 
 .PHONY: debug
 debug:
