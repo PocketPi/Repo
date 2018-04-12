@@ -77,12 +77,12 @@ INC_DIRS += $(FREERTOS_PORT_PLAT)
 
 # This is the path to the toolchain
 # (we don't put our toolchain on $PATH to keep the system clean)
-TOOLS_DIR = /opt/gcc-arm-none-eabi-7-2017-q4-major/bin
+TOOLS_DIR = /opt/gcc-arm-none-eabi-7-2017-q4-major/bin/
 
 # The tool we use
-CC      = arm-none-eabi-gcc
-OBJCOPY = arm-none-eabi-objcopy
-GDB     = arm-none-eabi-gdb
+CC      = $(TOOLS_DIR)arm-none-eabi-gcc
+OBJCOPY = $(TOOLS_DIR)arm-none-eabi-objcopy
+GDB     = $(TOOLS_DIR)arm-none-eabi-gdb
 
 ## Preprocessor options
 
