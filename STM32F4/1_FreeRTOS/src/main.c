@@ -24,7 +24,10 @@ int main(void)
     setup_LED();
     setup_usart();
 
-    my_printf("Build Time: %s\r\n", __TIME__);
+    const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J";
+    my_printf("%s", CLEAR_SCREEN_ANSI);
+
+    my_printf("Simple Embedded Shell - Build Time: %s\r\n", __TIME__);
 
     xTaskCreate(shell_task, "shell task", 1024, NULL, tskIDLE_PRIORITY, NULL);
 

@@ -6,10 +6,24 @@
 #include "usart.h"
 #include "shell.h"
 
-#define LINE_BUFSIZE 1024
+#define LINE_BUFSIZE    1024
+#define MAX_ARGC        16
 
-static char get_char()
-{
+char prompt[10] = "> ";
+
+
+static int valid_char(char input_char) {
+    if (
+        ((input_char > 31) &&    // Space to
+        (input_char < 128)) ||   // ~
+        (input_char == 13)      // Carriage return
+        ) {
+        return 1;
+    }
+    return 0;
+}
+
+static char get_char() {
     char c[] = "\0";
 
     do {
@@ -18,42 +32,68 @@ static char get_char()
         }
     } while (c[0] == '\0');
 
-    USART_SendByte(USART6, c[0]);
-    return c[0];
+    if (valid_char(c[0])) {
+        USART_SendByte(USART6, c[0]);
+        return c[0];
+    }
+    return 0;
 }
 
-int read_line(char * buffer)
-{
-    int position = 0;
+static int read_line(char * buffer, size_t buffer_size) {
+    size_t position = 0;
     char c;
 
     while (1) {
         // Read a character
         c = get_char();
+        buffer[position] = c;
 
         if (c == '\r') {
-            buffer[position++] = '\n';
-            buffer[position++] = '\r';
-            buffer[position] = '\0';
+            buffer[++position] = '\n';
+            buffer[++position] = '\0';
+            my_printf("\n");
             return 0;
-        } else {
-            buffer[position] = c;
         }
         position++;
+        if (position == buffer_size) {
+            return -1;
+        }
     }
 }
 
+static int parse_line(char * buffer, size_t buffer_size) {
+    (void)buffer_size;
+    size_t argc = 0;
+    char *argv[MAX_ARGC];
 
-void shell_task()
-{
+    char *token = strtok(buffer, " ");
+
+    while((token != NULL) && (argc < MAX_ARGC)) {
+        argv[argc++] = token;
+        token = strtok(NULL, " ");
+    }
+    argv[argc] = '\0';
+
+    return 0;
+}
+
+void set_prompt(char * buffer) {
+    memcpy(prompt, buffer, sizeof(prompt));
+}
+
+static void show_prompt() {
+    my_printf("%s", prompt);
+}
+
+void shell_task() {
     int status = 0;
     char line[LINE_BUFSIZE];
 
     memset(line, '\0', LINE_BUFSIZE);
 
     do {
-        my_printf("> ");
-        read_line(line);
-        my_printf("got: %s", line);
+        show_prompt();
+        status = read_line(line, sizeof(line));
+        parse_line(line, sizeof(line));
     }while (status == 0);
 }

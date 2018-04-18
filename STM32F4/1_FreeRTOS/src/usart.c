@@ -1,12 +1,11 @@
 #include <ctype.h>
 #include <string.h>
-#include "usart.h"
-
-
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+
+#include "usart.h"
 
 void vprint(const char *fmt, va_list argp)
 {
