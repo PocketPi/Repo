@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -61,20 +62,22 @@ static int read_line(char * buffer, size_t buffer_size) {
     }
 }
 
-static int parse_line(char * buffer, size_t buffer_size) {
-    (void)buffer_size;
+static void parse_line(char * command_line, size_t *argcp, char ***argvp) {
+
+    char *rest = command_line;
     size_t argc = 0;
     char *argv[MAX_ARGC];
 
-    char *token = strtok(buffer, " ");
+    char *token;
 
-    while((token != NULL) && (argc < MAX_ARGC)) {
-        argv[argc++] = token;
-        token = strtok(NULL, " ");
+    while(((token = strtok_r(rest, " ", &rest)) != NULL) && (argc < MAX_ARGC)) {
+        argv[argc] = token;
+        argc++;
     }
-    argv[argc] = '\0';
+    //argv[argc] = '\0';
 
-    return 0;
+    *argcp = argc;
+    *argvp = argv;
 }
 
 void set_prompt(char * buffer) {
@@ -85,15 +88,50 @@ static void show_prompt() {
     my_printf("%s", prompt);
 }
 
+int getopt_example(int argc, char **argv) {
+
+    for(int i=0;i<argc;i++)
+        my_printf("argv[%d]: %s\r\n", i, argv[i]);
+
+    while (1) {
+        char c;
+
+        c = getopt (argc, argv, "ab:");
+        if (c == -1) {
+            /* We have finished processing all the arguments. */
+            break;
+        }
+        switch (c) {
+        case 'a':
+            printf ("User has invoked with -a.\n");
+            break;
+        case 'b':
+            printf ("User has invoked with -b %s.\n", optarg);
+            break;
+        case '?':
+        default:
+            printf ("Usage: %s [-a] [-b <something>].\n", argv[0]);
+        }
+    }
+
+    /* Other code omitted */
+    return 0;
+}
+
 void shell_task() {
     int status = 0;
-    char line[LINE_BUFSIZE];
+    char command_line[LINE_BUFSIZE];
+    size_t argc;
+    char **argv;
 
-    memset(line, '\0', LINE_BUFSIZE);
+    memset(command_line, '\0', LINE_BUFSIZE);
 
     do {
         show_prompt();
-        status = read_line(line, sizeof(line));
-        parse_line(line, sizeof(line));
-    }while (status == 0);
+        status = read_line(command_line, sizeof(command_line));
+        parse_line(command_line, &argc, &argv);
+        for (size_t i=0; i<argc; i++)
+            my_printf("argc: %d, argv[%d]: %s\r\n", argc, i, argv[i]);
+        getopt_example(argc, argv);
+    } while (status == 0);
 }
