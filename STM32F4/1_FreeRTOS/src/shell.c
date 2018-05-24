@@ -42,16 +42,15 @@ static char get_char() {
 
 static int read_line(char * buffer, size_t buffer_size) {
     size_t position = 0;
-    char c;
+    char c = '\0';
 
     while (1) {
         // Read a character
         c = get_char();
         buffer[position] = c;
 
-        if (c == '\r') {
-            buffer[++position] = '\n';
-            buffer[++position] = '\0';
+        if ((c == '\r') || (c == '\n')) {
+            buffer[position] = '\0';
             my_printf("\n");
             return 0;
         }
@@ -62,22 +61,20 @@ static int read_line(char * buffer, size_t buffer_size) {
     }
 }
 
-static void parse_line(char * command_line, size_t *argcp, char ***argvp) {
-
-    char *rest = command_line;
-    size_t argc = 0;
-    char *argv[MAX_ARGC];
-
-    char *token;
-
-    while(((token = strtok_r(rest, " ", &rest)) != NULL) && (argc < MAX_ARGC)) {
-        argv[argc] = token;
-        argc++;
+size_t parse_line(
+        char           *buffer,     ///< In/Out : Modifiable String Buffer To Tokenise
+        size_t         *argc,       ///< Out    : Argument Count
+        char           *argv[],     ///< Out    : Argument String Vector Array
+        const size_t    argv_length ///< In     : Maximum Count For `*argv[]`
+    )
+{ /* Tokenise string buffer into argc and argv format (req: string.h) */
+    size_t i = 0;
+    for (i = 0 ; i < argv_length ; i++)
+    { /* Fill argv via strtok_r() */
+        if ( NULL == (argv[i] = strtok_r( NULL, " ", &buffer)) ) break;
     }
-    //argv[argc] = '\0';
-
-    *argcp = argc;
-    *argvp = argv;
+    *argc = i;
+    return i; // Argument Count
 }
 
 void set_prompt(char * buffer) {
@@ -90,31 +87,27 @@ static void show_prompt() {
 
 int getopt_example(int argc, char **argv) {
 
-    for(int i=0;i<argc;i++)
-        my_printf("argv[%d]: %s\r\n", i, argv[i]);
-
     while (1) {
-        char c;
+        int c;
 
         c = getopt (argc, argv, "ab:");
         if (c == -1) {
-            /* We have finished processing all the arguments. */
             break;
         }
         switch (c) {
         case 'a':
-            printf ("User has invoked with -a.\n");
+            my_printf ("User has invoked with -a.\r\n");
             break;
         case 'b':
-            printf ("User has invoked with -b %s.\n", optarg);
+            my_printf ("User has invoked with -b %s.\r\n", optarg);
             break;
         case '?':
         default:
-            printf ("Usage: %s [-a] [-b <something>].\n", argv[0]);
+            my_printf ("Usage: %s [-a] [-b <something>].\r\n", argv[0]);
+            break;
         }
     }
 
-    /* Other code omitted */
     return 0;
 }
 
@@ -122,16 +115,14 @@ void shell_task() {
     int status = 0;
     char command_line[LINE_BUFSIZE];
     size_t argc;
-    char **argv;
+    char *argv[MAX_ARGC];
 
     memset(command_line, '\0', LINE_BUFSIZE);
 
     do {
         show_prompt();
         status = read_line(command_line, sizeof(command_line));
-        parse_line(command_line, &argc, &argv);
-        for (size_t i=0; i<argc; i++)
-            my_printf("argc: %d, argv[%d]: %s\r\n", argc, i, argv[i]);
+        parse_line(command_line, &argc, argv, MAX_ARGC);
         getopt_example(argc, argv);
     } while (status == 0);
 }
