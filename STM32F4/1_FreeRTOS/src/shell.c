@@ -9,6 +9,17 @@
 
 #define LINE_BUFSIZE    1024
 #define MAX_ARGC        16
+#define MAX_CMDS        16
+#define MAX_CMDNAME_LEN 32
+
+typedef int (*cb_t) (int argc, char ** argv);
+
+typedef struct {
+  char name[MAX_CMDNAME_LEN];
+  cb_t cb;
+} cmd_t;
+
+static cmd_t cmds[MAX_CMDS];
 
 char prompt[10] = "> ";
 
@@ -102,7 +113,32 @@ static void show_prompt() {
     my_printf("%s", prompt);
 }
 
+void exec_cmd(int argc, char **argv) {
+    for(int ii = 0; ii<MAX_CMDS; ii++) {
+        if(strncmp(argv[0], cmds[ii].name, MAX_CMDNAME_LEN) == 0) {
+            cmds[ii].cb(argc, argv);
+        }
+    }
+}
+
+int add_cmd(char * name, cb_t cb) {
+    if (name != NULL) {
+        strncpy(cmds[0].name, name, MAX_CMDNAME_LEN);
+    } else {
+        return -1;
+    }
+    if (cb != NULL) {
+        cmds[0].cb = cb;
+    } else {
+        return -2;
+    }
+    return 0;
+}
+
 void shell_task() {
+
+    add_cmd("getopt", getopt_example);
+
     int status = 0;
     char command_line[LINE_BUFSIZE];
     size_t argc;
@@ -114,6 +150,6 @@ void shell_task() {
         show_prompt();
         status = read_line(command_line, sizeof(command_line));
         parse_line(command_line, &argc, argv, MAX_ARGC);
-        getopt_example(argc, argv);
+        exec_cmd(argc, argv);
     } while (status == 0);
 }
