@@ -13,14 +13,31 @@
 char prompt[10] = "> ";
 
 
-static int valid_char(char input_char) {
-    if (
-        ((input_char > 31) &&    // Space to
-        (input_char < 128)) ||   // ~
-        (input_char == 13)      // Carriage return
-        ) {
-        return 1;
+int getopt_example(int argc, char **argv) {
+
+    /* Reset optind to enable calling the getopt multiple times */
+    optind = 1;
+    while (1) {
+        int c;
+
+        c = getopt(argc, argv, "ab:");
+        if (c == -1) {
+            break;
+        }
+        switch (c) {
+        case 'a':
+            my_printf ("User has invoked with -a.\r\n");
+            break;
+        case 'b':
+            my_printf ("User has invoked with -b %s.\r\n", optarg);
+            break;
+        case '?':
+        default:
+            my_printf ("Usage: %s [-a] [-b <something>].\r\n", argv[0]);
+            break;
+        }
     }
+
     return 0;
 }
 
@@ -33,7 +50,7 @@ static char get_char() {
         }
     } while (c[0] == '\0');
 
-    if (valid_char(c[0])) {
+    if (isascii(c[0])) {
         USART_SendByte(USART6, c[0]);
         return c[0];
     }
@@ -83,32 +100,6 @@ void set_prompt(char * buffer) {
 
 static void show_prompt() {
     my_printf("%s", prompt);
-}
-
-int getopt_example(int argc, char **argv) {
-
-    while (1) {
-        int c;
-
-        c = getopt (argc, argv, "ab:");
-        if (c == -1) {
-            break;
-        }
-        switch (c) {
-        case 'a':
-            my_printf ("User has invoked with -a.\r\n");
-            break;
-        case 'b':
-            my_printf ("User has invoked with -b %s.\r\n", optarg);
-            break;
-        case '?':
-        default:
-            my_printf ("Usage: %s [-a] [-b <something>].\r\n", argv[0]);
-            break;
-        }
-    }
-
-    return 0;
 }
 
 void shell_task() {
